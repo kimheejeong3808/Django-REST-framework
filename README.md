@@ -166,4 +166,5 @@ Unique Key : 테이블 내 항상 유일해야 하는 값 / 해당 컬럼에 입
 ## 4. django에서 queryset과 object는 어떻게 다른지 서술하기
 쿼리셋(QuerySet): 데이터베이스에서 전달받은 모델의 객체 목록 / 리스트와 구조가 같지만, 파이썬 기본 자료구조가 아니기 때문에 파이썬에서 읽고 쓰기 위해서는 자료형으로 변환을 해줘야 한다.
  예) <QuerySet [<Post: my post title>, <Post: another post title>]>
+ 
 오브젝트(Object): 데이터베이스를 하나의 객체 덩어리로 봄 
