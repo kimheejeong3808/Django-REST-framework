@@ -3,17 +3,21 @@
 ## 1. args, kwargs를 사용하는 예제 코드 짜보기
 원래 함수를 정의하고 난 후 함수의 파라미터의 개수는 변하지 않는다.
 예를 들어,
+
 def print_numbers(a,b,c):
     print(a)
     print(b)
     print(c)
 
+
 와 같이 정의했을 때, 3개의 파라미터 a, b, c에 3개의 인자값이 들어가야 한다.
 그렇지 않으면 인자의 개수가 많거나 적다는 오류가 발생한다.
 하지만,
+
 def print_numbers(*args):
     for arg in args:
         print(arg)
+
 
 >>> print_numbers(1,2,3,4,5)
 1
@@ -21,6 +25,7 @@ def print_numbers(*args):
 3
 4
 5
+
 
 와 같이 파라미터에 *(애스터리스크)를 붙여주면 몇 개의 이자를 넣든 상관이 없다.
 이때 args라고 작성한 이유가 궁금할 수 있다.
