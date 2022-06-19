@@ -69,12 +69,25 @@ class User(AbstractBaseUser):
         return self.is_admin
 
 
+
+# 취미 : 운동
+class Hobby(models.Model):
+    name = models.CharField("취미 이름", max_length=20)
+    def __str__(self):
+        return self.name
+    
+# 역참조하는 필드에 related name을 설정하지 않았을 경우 : 기본적으로 테이블 뒤에 _set이 붙음 
+# (user가 userprofile을 바라보듯 one-to-one 필드는 예외로 _set이 붙지 않음)
+
+
+
 # user profile model
 class UserProfile(models.Model):
     user = models.OneToOneField(to=User, verbose_name="사용자", on_delete=models.CASCADE, primary_key=True)
-    introduction = models.TextField("소개")
+    introduction = models.TextField("자기소개", null=True, blank=True)
     birthday = models.DateField("생일")
     age = models.IntegerField("나이")
+    hobby = models.ManyToManyField(Hobby, verbose_name="취미")
     
     def __str__(self):
         return f"{self.user.username}님의 프로필입니다"

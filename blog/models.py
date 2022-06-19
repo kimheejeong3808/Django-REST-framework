@@ -15,4 +15,13 @@ class Article(models.Model):
     content = models.TextField("본문")
     
     def __str__(self):
-        return f'{self.title} {self.user.username} 님이 작성하신 글입니다.'
+        return f'{self.title}을 작성하셨습니다.'
+    
+    
+class Comment(models.Model):
+    article = models.ForeignKey('Article', verbose_name="게시글", on_delete=models.CASCADE)
+    comment_user = models.ForeignKey('user.User', verbose_name="댓글작성자", on_delete=models.CASCADE)
+    comment_content = models.TextField("댓글내용", max_length=100)
+    
+    def __str__(self):
+        return f'{self.comment_content}을 작성하셨습니다.'
