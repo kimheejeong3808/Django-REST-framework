@@ -12,18 +12,17 @@ from user.models import Hobby as HobbyModel
 
 from user.serializers import UserSerializer
 
-from django_rest_framework.permissions import RegistedMoreThanAWeekUser
 
 # Create your views here.
 class UserView(APIView): # CBV 방식
     # permission_classes = [permissions.AllowAny] # 누구나 view 조회 가능 
     # permission_classes = [permissions.IsAdminUser] # admin만 view 조회 가능
     permission_classes = [permissions.IsAuthenticated] # 로그인 된 사용자만 view 조회 가능
-    # permission_classes = [RegistedMoreThanAWeekUser] # permissions.py 에서 정의한 것
+    # permission_classes = [RegistedMoreThanAweekUser] # permissions.py 에서 정의한 것
 
     # 사용자 정보 조회
     def get(self, request):
-        return Response(UserSerializer(request.user).data)
+        return Response(UserSerializer(request.user).data, status=status.HTTP_200_OK)
     
         # 모든 사용자 정보를 가져오고 싶을 때
         # all_users = UserModel.objects.all()
@@ -55,7 +54,17 @@ class UserView(APIView): # CBV 방식
     
     # 회원가입
     def post(self, request):
+        # 비밀번호 해싱해서 가입하는 방법1
+        # serializer = UserSignupSerializer(data=request.data)
+        # if serializer.is_valid():
+        #     serializer.save()
+        #     return Response({'message': '가입 완료!!!!'})
+        # else:
+        #     print(serializer.errors)
+        #     return Response({'message': '가입 실패!!!!'})
+        
         return Response({'message': 'post method!!'})
+            
 
     # 회원 정보 수정
     def put(self, request):
