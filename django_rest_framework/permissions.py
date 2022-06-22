@@ -25,13 +25,13 @@ class IsAdminOrIsAuthenticatedReadOnly(BasePermission):
                     "detail": "서비스를 이용하기 위해 로그인 해주세요.",
                 }
             raise GenericAPIException(status_code=status.HTTP_401_UNAUTHORIZED, detail=response)
-
+        # admin 사용자 
         if user.is_authenticated and user.is_admin:
             return True
-            
+        # 로그인 사용자가 get요청 시 True
         if user.is_authenticated and request.method in self.SAFE_METHODS:
             return True
-        
+        # 가입일이 7일 이상 된 사용자의 경우 True
         if user.is_authenticated and request.user.join_date < (timezone.now() - timedelta(days=7)):
             return True
         

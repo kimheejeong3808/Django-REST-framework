@@ -16,10 +16,10 @@ class CommentSerializer(serializers.ModelSerializer):
 
 class ArticleSerializer(serializers.ModelSerializer):
     category = serializers.SerializerMethodField()
-    comments = CommentSerializer(many=True, source="comment_set")
+    comments = CommentSerializer(many=True, source="comment_set", read_only=True)
     
     def get_category(self, obj):
         return [category.name for category in obj.category.all()]
     class Meta:
         model = ArticleModel
-        fields = ["title", "content", "comments", "category"]
+        fields = ["user", "title", "content", "comments", "category"]

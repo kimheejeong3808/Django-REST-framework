@@ -14,8 +14,8 @@ class Article(models.Model):
     title = models.CharField("제목", max_length=50)
     category = models.ManyToManyField("Category", verbose_name="카테고리")
     content = models.TextField("본문")
-    exposure_start = models.DateTimeField("노출시작일자", default=timezone.now())
-    exposure_finish = models.DateTimeField("노출종료일자", default=timezone.now())
+    exposure_start = models.DateTimeField("노출시작일자", default=timezone.now)
+    exposure_finish = models.DateTimeField("노출종료일자", default=timezone.now)
     
     def __str__(self):
         return f'{self.title}을 작성하셨습니다.'

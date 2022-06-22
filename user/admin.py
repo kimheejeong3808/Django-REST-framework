@@ -35,6 +35,9 @@ class UserAdmin(BaseUserAdmin):
     inlines = (
             UserProfileInline,
         )
+    
+    # add field sets
+    add_fieldsets = ((None, {'classes':('wide',), 'fields':('email', 'fullname','password1','password2')}), )
 
 
 admin.site.register(User, UserAdmin)

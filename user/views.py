@@ -1,3 +1,4 @@
+from functools import partial
 from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework import permissions
@@ -22,6 +23,10 @@ class UserView(APIView): # CBV 방식
 
     # 사용자 정보 조회
     def get(self, request):
+        # 20일 강의)) request.user를 넘겨주는데 context를 추가해 내가 원하는 정보를 같이 넘겨줌
+        # user_serializer = UserSerializer(request.user, context={"request":request}).data
+        # return Response(user_serializer, status=status.HTTP_200_OK)
+        
         return Response(UserSerializer(request.user).data, status=status.HTTP_200_OK)
     
         # 모든 사용자 정보를 가져오고 싶을 때
@@ -63,12 +68,31 @@ class UserView(APIView): # CBV 방식
         #     print(serializer.errors)
         #     return Response({'message': '가입 실패!!!!'})
         
-        return Response({'message': 'post method!!'})
-            
-
-    # 회원 정보 수정
-    def put(self, request):
-        return Response({'message': 'put method!!'})
+        # 21일 강의)) serializer 각 필드의 옵션을 POST에도 적용해보기
+        user_serializer = UserSerializer(data=request.data)
+        if user_serializer.is_valid():
+            user_serializer.save()
+            return Response(user_serializer.data, status=status.HTTP_200_OK)
+        
+        # False
+        return Response(user_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+        
+    # 회원 정보 수정 (urls.py에도 <obj_id>추가 포스트맨 테스트용으로 id 2번 어드민)
+    def put(self, request, obj_id):
+        user = UserModel.objects.get(id=obj_id)
+        # 실제로 회원정보 수정기능 만들때 본인 것만 수정하도록 해야함
+        # user=request.user
+        
+        # 시리얼라이저에 넣기 전에 pop을 사용하여 변경되지 않을 필드 지정해줌(유저네임에 어떤걸 넣어도 안바뀜)
+        request.data.pop("username", "")
+        # user를 써서 어떤걸 수정할지 지정해줌 나머지는 post와 같음 / 필드에 있는 데이터가 일부만 들어가도 되는 partial
+        user_serializer = UserSerializer(user, data=request.data, partial=True)
+        if user_serializer.is_valid():
+            user_serializer.save()
+            return Response(user_serializer.data, status=status.HTTP_200_OK)
+        
+        return Response(user_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     # 회원 탈퇴
     def delete(self, request):
