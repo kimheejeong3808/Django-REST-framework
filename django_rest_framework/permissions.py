@@ -37,35 +37,21 @@ class IsAdminOrIsAuthenticatedReadOnly(BasePermission):
         
         return False
 
-# datetimefield 와 비교시( 현재 user의 models.py의  join_date 는 datetimefield로 되어 있음)
-# user.join_date < (timezone.now()-timedelta(days=7))
-
-# datefield 와 비교시
-# print(f"user join date : {user.join_date}")
-# print(f"now date : {datetime.now().date()}")
-# user.join_date < (datetime.now().date()-timedelta(days=7))
-
-# class RegistedMoreThanAweekUser(BasePermission):
-#     """
-#     가입일 기준 7일 이상 지난 사용자만 접근 가능
-#     """
-#     message = '가입 후 7일 이상 지난 사용자만 게시글을 쓸 수 있습니다.'
+class RegisteredMoreThanThreeDaysUser(BasePermission):
+    SAFE_METHODS = ('GET',)
+    message = '가입 후 3일 이상 지난 사용자만 사용하실 수 있습니다.'
+    def has_permission(self, request, view):
+        user=request.user
+        if not user.is_authenticated:
+            response = {
+                "detail":"서비스를 이용하기 위해 로그인 해주세요.",
+            }
+            raise GenericAPIException(status_code=status.HTTP_401_UNAUTHORIZED, detail=response)
     
-#     def has_permission(self, request, view):
-#         user = request.user
+        # 로그인 사용자가 get 요청 시 True
+        if user.is_authenticated and request.method in self.SAFE_METHODS:
+            return True
         
-#         # if not user or not user.is_authenticated:
-#         #     return False
-        
-#         # Date field :  2002-10-2
-#         # DateTime field : 2002-10-2 10:50:21
-#         # 가입일이 7일 전보다 더 적어야 7일 이상 된 것이임 -> True
-        
-#         # print(f"user join date : {user.join_date}")
-#         # print(f"now date : {timezone.now()}")
-#         # print(f"a week ago date : {timezone.now()-timedelta(days=7)}")
-#         # return bool(user.join_date < (timezone.now()-timedelta(days=7)))
-        
-#         # 두가지 전부 충족되면 True가 나오고, 하나라도 충족되지 않으면 False
-#         return bool(request.is_authenticated and request.user.join_date < (timezone.now() - timedelta(days=7)))
-    
+        return bool(user.is_authenticated and
+                    request.user.join_date < (timezone.now() - timedelta(days=3)))
+            
