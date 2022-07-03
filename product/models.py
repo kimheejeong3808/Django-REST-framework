@@ -5,6 +5,7 @@ from django.utils import timezone
 # Create your models here.
 class Product(models.Model):
     user = models.ForeignKey('user.User', verbose_name="작성자", on_delete=models.SET_NULL, null=True)
+    title = models.CharField("제목", max_length=50)
     thumbnail = models.FileField(upload_to = 'product/', verbose_name="썸네일")
     content = models.TextField("제품설명")
     created = models.DateTimeField("등록시간", auto_now_add=True)

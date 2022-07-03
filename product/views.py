@@ -36,8 +36,9 @@ class ProductView(APIView): # CBV 방식
             product_serializer.save()
             return Response(product_serializer.data, status=status.HTTP_200_OK)
         else:
-            Response(product_serializer.errors, status=status.HTTP_400_BAD_REQUEST )
+            return Response(product_serializer.errors, status=status.HTTP_400_BAD_REQUEST )
 
+    # 제품 수정
     def put(self, request, product_id):
         product = ProductModel.objects.get(id=product_id)
         # product는 기존의 내용/ data는 새로 수정한 내용 / partial 일부 수정 허용
@@ -47,7 +48,7 @@ class ProductView(APIView): # CBV 방식
             product_serializer.save()
             return Response(product_serializer.data, status=status.HTTP_200_OK)
         else:
-            Response(product_serializer.errors, status=status.HTTP_400_BAD_REQUEST )
+            return Response(product_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     # 등록 삭제
     def delete(self, request):

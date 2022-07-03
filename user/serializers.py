@@ -53,6 +53,9 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
 class UserSerializer(serializers.ModelSerializer):
     userprofile = UserProfileSerializer()          # userprofile은 one-to-one 관계라서 object 형태
+    articles = ArticleSerializer(many=True, source="article_set", read_only=True)    # article_set = ArticleSerializer(many=True) 이렇게 해도 됨
+    comments = CommentSerializer(many=True, source="comment_set")
+
     # class Meta:
         # serializer에 사용될 model, fields지정
         # 모든 필드를 사용하고 싶을 경우 fields = "__all__"로 사용   fields = "__all__"
@@ -61,8 +64,8 @@ class UserSerializer(serializers.ModelSerializer):
         # fields = ["username", "password", "fullname", "email", "userprofile"] 
         
     # user_detail = UserProfileSerializer(source="userprofile")   # userprofile 대신, user_detail 이라고 이름을 이렇게 바꾸고, souce에 userprofile을 넣으면 됨
-    articles = ArticleSerializer(many=True, source="article_set", read_only=True)    # article_set = ArticleSerializer(many=True) 이렇게 해도 됨
-    # comments = CommentSerializer(many=True, source="comment_set")
+    
+    
     
     # 20일 강의)) 내가 이 필드를 생성해서 request로 받은거에서 유저의 fullname을 보여줘
     # login_user_fullname = serializers.SerializerMethodField()
@@ -132,7 +135,7 @@ class UserSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = UserModel
-        fields = ["username", "password", "fullname", "email", "userprofile", "articles","join_date"]
+        fields = ["username", "password", "fullname", "email", "userprofile", "articles","comments","join_date"]
         
         # 21일 수업)) 각 필드에 해당하는 다양한 옵션 지정
         extra_kwargs = {
@@ -156,25 +159,25 @@ class UserSerializer(serializers.ModelSerializer):
         
 
 # 비밀번호 해싱해서 가입하는 방법1
-# class UserSignupSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = UserModel
-#         fields = "__all__"
+class UserSignupSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserModel
+        fields = "__all__"
         
-#     # 패스워드 해싱
-#     def create(self, *args, **kwargs):
-#         user = super().create(*args, **kwargs)   #super() 상위의...
-#         p = user.password     # 패스워드를 꺼내와서
-#         user.set_password(p)  # set_password로 패스워드를 해싱해서 넣어줌
-#         user.save()
-#         return user
+    # 패스워드 해싱
+    def create(self, *args, **kwargs):
+        user = super().create(*args, **kwargs)   #super() 상위의...
+        p = user.password     # 패스워드를 꺼내와서
+        user.set_password(p)  # set_password로 패스워드를 해싱해서 넣어줌
+        user.save()
+        return user
     
-#     def update(self, *args, **kwargs):
-#         user = super().create(*args, **kwargs)   
-#         p = user.password
-#         user.set_password(p)
-#         user.save()
-#         return user
+    def update(self, *args, **kwargs):
+        user = super().create(*args, **kwargs)   
+        p = user.password
+        user.set_password(p)
+        user.save()
+        return user
 
 
 

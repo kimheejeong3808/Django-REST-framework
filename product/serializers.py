@@ -5,24 +5,28 @@ from product.models import Review as ReviewModel
 from django.db.models import Avg
 
 class ReviewSerializer(serializers.ModelSerializer):
+    # 이걸 안쓰면 user의 id값만 나오니까 메소드필드 추가함
     user = serializers.SerializerMethodField()
-    
+    # 이걸 정의하면 바로 user=fullname값이 나옴
     def get_user(self, obj):
         return obj.user.fullname
     
     class Meta:
         model = ReviewModel
-        field = ["user", "content", "created", "rating"]
+        fields = ["user", "product", "content", "created", "rating"]
 
 
 class ProductSerializer(serializers.ModelSerializer):
+    # 상품정보를 리턴할때 리뷰를 같이 보여주는데 그때 리뷰의 형식을 여기서 지정
     review = serializers.SerializerMethodField()
     def get_review(self, obj):
+        # product에서 역참조로 review 내용을 다 가져온 것
         reviews = obj.review_set
         return {
             "last_review":ReviewSerializer(reviews.last()).data,
             "average_rating":reviews.aggregate(Avg("rating"))
         }
+    # 기존 is_valid() function 에 추가하여 커스텀할 수 있는 validate
     def validate(self, data):
         exposure_end_date = data.get("exposure_end_date", "")
         if exposure_end_date and exposure_end_date < datetime.now().date():
@@ -34,27 +38,42 @@ class ProductSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         product = ProductModel(**validated_data)
         product.save()
+        # 2번 저장하는 이유는 위에서 저장을 해야 밑에서 created라는 기능을 쓸 수 있기 때문
         product.content += f"\n\n{product.created.replace(microsecond=0, tzinfo=None)}에 등록된 상품입니다."
         product.save()
         return product
         
     def update(self, instance, validated_data):
+        # 위의 과정처럼 해줘도 됨
+        # for key, value in validated_data.items():
+            # if key == "content":
+            #     value += f"\n\n{instance.created.replace(microsecond=0, tzinfo=None)}에 등록된 상품입니다."
+            # setattr(instance, key, value)
+            # instance.save()
+            # instance.content = f"{instance.modified.replace(microsecond=0, tzinfo=None)}에 수정되었습니다.\n\n"\
+            #                     + instance.content
+            # instance.save()
         for key, value in validated_data.items():
             if key == "content":
-                value += f"\n\n{instance.created.replace(microsecond=0, tzinfo=None)}에 등록된 상품입니다."
+                created = getattr(instance, key).split("\n")[-1]
+                # validated_data의 value에 가져온 한 줄을 추가
+                value += f"\n\n{created}"
             setattr(instance, key, value)
-        instance.save()
         instance.content = f"{instance.modified.replace(microsecond=0, tzinfo=None)}에 수정되었습니다.\n\n"\
                                 + instance.content
         instance.save()
         return instance
                                 
-                
+    # SlugRelatedField 사용 -> user id값이 아닌 username을 가져올 수 있음
+    # user = serializers.SlugRelatedField(
+    #     read_only=True,
+    #     slug_field='username'
+    #     )            
             
-    
+
     class Meta:
         model = ProductModel
-        fields = ["user", "thumbnail", "content", "created", 
+        fields = ["user", "title", "thumbnail", "content", "created", 
                   "modified", "exposure_end_date", "is_active", "price", "review"]
     
     

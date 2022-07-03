@@ -36,7 +36,7 @@ class UserAdmin(BaseUserAdmin):
             UserProfileInline,
         )
     
-    # add field sets
+    # add field sets(add user 했을때)
     add_fieldsets = ((None, {'classes':('wide',), 'fields':('email', 'fullname','password1','password2')}), )
 
 
